@@ -1,0 +1,26 @@
+{
+  "name": "kuepa_edutech",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "4.21.1",
+    "mongoose": "8.8.2"
+  },
+  "devDependencies": {
+    "@types/express": "5.0.0",
+    "@types/mongoose": "5.11.96",
+    "@types/node": "22.9.4",
+    "nodemon": "3.1.7",
+    "typescript": "5.7.2"
+  }
+}
