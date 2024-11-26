@@ -11,7 +11,12 @@
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
-    "noEmit": true,
+
+    /* Emit files */
+    "outDir": "./dist", // Output directory for compiled files
+    "declaration": true, // Generate .d.ts files for type definitions
+    "declarationDir": "./dist/types", // Directory for type declarations
+    "removeComments": true, // Remove comments in the output
 
     /* Linting */
     "strict": true,
@@ -20,5 +25,6 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["vite.config.ts"]
+  "include": ["src/**/*", "vite.config.ts"], // Include all project files
+  "exclude": ["node_modules", "dist", "test"] // Exclude unnecessary directories
 }
