@@ -5,6 +5,7 @@ import { Database } from "@/infrastructure/database/conn"
 import AuthRouter from "@/infrastructure/http/routes/authRoutes"
 import MessageRouter from "@/infrastructure/http/routes/messageRoutes"
 import { WSServer } from "@/infrastructure/websocket/wsServer"
+import cors from "cors"
 
 dotenv.config()
 
@@ -30,6 +31,18 @@ export class ServerApp {
   private configureMiddlewares(): void {
     this.app.use(express.json())
     this.app.use(express.urlencoded({ extended: true }))
+
+    this.app.use(
+      cors({
+        origin: true,
+        allowedHeaders: ["Content-Type", "Authorization", "authorization"],
+        methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+        credentials: true,
+        preflightContinue: false,
+      }),
+    )
+
+    this.app.options("*", cors())
   }
 
   private configureRoutes(): void {

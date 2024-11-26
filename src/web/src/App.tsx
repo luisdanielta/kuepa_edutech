@@ -1,5 +1,8 @@
+import React from "react"
+import HomePage from "@/pages/home"
+
 function App() {
-  return <>xd</>
+  return <HomePage />
 }
 
 export default App

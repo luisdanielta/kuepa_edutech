@@ -1,16 +1,25 @@
-import { getToken } from "../utils/auth"
+import { TokenStorage } from "../../utils/tokenStorage"
 import { HttpClient, HttpRequestConfig, HttpResponse } from "./httpClient"
 
 export class ApiClient extends HttpClient {
-  constructor() {
-    super("https://localhost:3000/v1/api")
+  private static instance: ApiClient
+
+  private constructor() {
+    super("http://localhost:3000/v1/api")
   }
 
-  protected async request<T>(
+  public static getInstance(): ApiClient {
+    if (!ApiClient.instance) {
+      ApiClient.instance = new ApiClient()
+    }
+    return ApiClient.instance
+  }
+
+  public async request<T>(
     endpoint: string,
     config: HttpRequestConfig = {},
   ): Promise<HttpResponse<T>> {
-    const token = getToken()
+    const token = TokenStorage.getToken()
     const headers = {
       ...config.headers,
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
