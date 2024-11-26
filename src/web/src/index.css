@@ -64,3 +64,28 @@
     @apply bg-background text-foreground;
   }
 }
+
+header {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+h1 {
+  color: #1f2937; /* Text color consistent with the system UI */
+}
+
+.menubar {
+  color: #4b5563; /* Gray text for Menubar */
+}
+.menubar:hover {
+  color: #111827; /* Darker gray on hover */
+}
+
+.dialog input {
+  border: 1px solid #d1d5db; /* Light gray border */
+}
+.dialog input:focus {
+  border-color: #3b82f6; /* Blue border on focus */
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); /* Blue focus ring */
+}

@@ -4,8 +4,8 @@ import dotenv from "dotenv"
 import { Database } from "@/infrastructure/database/conn"
 import AuthRouter from "@/infrastructure/http/routes/authRoutes"
 import MessageRouter from "@/infrastructure/http/routes/messageRoutes"
-import { WSServer } from "@/infrastructure/websocket/wsServer"
 import cors from "cors"
+import { WSServer } from "../websocket/ws"
 
 dotenv.config()
 

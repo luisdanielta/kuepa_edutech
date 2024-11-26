@@ -1,6 +1,6 @@
 import React from "react"
 import { Navigate, Outlet } from "react-router"
-import { AuthService } from "@/api/services/authService"
+import { useUserContext } from "@/hooks/useUserContext"
 
 interface ProtectedRouteProps {
   allowedRoles: Array<"user" | "moderator">
@@ -9,14 +9,13 @@ interface ProtectedRouteProps {
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   allowedRoles,
 }) => {
-  const isAuthenticated = AuthService.isAuthenticated()
-  const userRole = AuthService.getRole()
+  const { user, isAuthenticated } = useUserContext()
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
   }
 
-  if (!allowedRoles.includes(userRole!)) {
+  if (!allowedRoles.includes(user?.role || "")) {
     return <Navigate to="/login" replace />
   }
 

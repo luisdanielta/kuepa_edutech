@@ -1,6 +1,6 @@
 import React from "react"
 import ChatBox from "../components/chat/ChatBox"
-import ModeladorBox from "../components/ModeladorBox"
+import ModeratorBox from "../components/ModeratorBox"
 
 export default function HomePage() {
   return (
@@ -9,7 +9,7 @@ export default function HomePage() {
         <ChatBox />
       </div>
       <div className="flex-1">
-        <ModeladorBox />
+        <ModeratorBox />
       </div>
     </div>
   )

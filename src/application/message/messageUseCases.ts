@@ -11,6 +11,10 @@ export class MessageUseCases {
   constructor(private messageRepository: MessageRepository) {}
 
   async createMessage(data: CreateMessageDTO): Promise<Message> {
+    if (!data.text.trim()) {
+      throw new Error("Message text cannot be empty")
+    }
+
     const message = new Message(
       null,
       data.text,
@@ -36,12 +40,19 @@ export class MessageUseCases {
 
   async updateMessage(
     id: string,
-    data: Partial<Message>,
+    data: Partial<Pick<Message, "text" | "likes">>,
   ): Promise<Message | null> {
+    if (data.text && !data.text.trim()) {
+      throw new Error("Message text cannot be empty")
+    }
     return this.messageRepository.update(id, data)
   }
 
   async deleteMessage(id: string): Promise<boolean> {
+    const message = await this.getMessageById(id)
+    if (!message) {
+      throw new Error("Message not found")
+    }
     return this.messageRepository.delete(id)
   }
 }

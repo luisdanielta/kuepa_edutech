@@ -1,47 +1,62 @@
 import React from "react"
-import { Link } from "react-router"
+import { Link, useNavigate } from "react-router"
 import { loginSchema } from "@/schemas/authSchema"
 import { FormLayout } from "@/components/forms/FormLayout"
 import { AuthForm } from "@/components/forms/AuthForm"
 import { AuthService } from "@/api/services/authService"
+import { useUserContext } from "@/hooks/useUserContext"
 
 export default function LoginPage() {
+  const { login } = useUserContext() // Access the login method from UserContext
+  const navigate = useNavigate() // Redirect after login
+
+  // Handle the login form submission
   const handleLogin = async (data: { username: string; password: string }) => {
     try {
-      AuthService.login(data.username, data.password)
+      // Call the login service
+      const response = await AuthService.login(data.username, data.password)
+
+      // Map the user data from the response
+      const userData = response.user
+
+      // Save the user and token in the context
+      login(userData, response.token)
+
+      // Redirect the user to the home page
+      navigate("/")
     } catch (error) {
-      console.error("Error al iniciar sesión:", error)
-      alert("Error al iniciar sesión. Verifica tus credenciales.")
+      console.error("Error logging in:", error)
+      alert("Error logging in. Please check your credentials.")
     }
   }
 
   return (
     <FormLayout
-      title="Iniciar Sesión"
-      description="Ingresa tu usuario y contraseña para acceder a tu cuenta"
+      title="Log In"
+      description="Enter your username and password to access your account"
       footer={
         <p className="text-center text-sm text-gray-500">
-          ¿No tienes una cuenta?{" "}
+          Don't have an account?{" "}
           <Link to="/sign-up" className="text-indigo-600 hover:underline">
-            Regístrate
+            Sign Up
           </Link>
         </p>
       }
     >
       <AuthForm
-        schema={loginSchema}
-        onSubmit={handleLogin}
-        defaultValues={{ username: "", password: "" }}
-        submitText="Iniciar Sesión"
+        schema={loginSchema} // Validation schema for the form
+        onSubmit={handleLogin} // Form submission handler
+        defaultValues={{ username: "", password: "" }} // Default form values
+        submitText="Log In"
         fields={[
           {
             name: "username",
-            label: "Nombre de Usuario",
-            placeholder: "tu_usuario",
+            label: "Username",
+            placeholder: "your_username",
           },
           {
             name: "password",
-            label: "Contraseña",
+            label: "Password",
             placeholder: "••••••••",
             type: "password",
           },
