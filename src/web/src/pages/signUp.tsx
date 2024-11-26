@@ -1,51 +1,104 @@
+import React from "react"
+import { Link, useNavigate } from "react-router"
 import { signupSchema } from "@/schemas/authSchema"
 import { FormLayout } from "@/components/forms/FormLayout"
 import { AuthForm } from "@/components/forms/AuthForm"
-import React from "react"
-import { Link } from "react-router"
+import { AuthService } from "@/api/services/authService"
+import {
+  ToastProvider,
+  Toast,
+  ToastTitle,
+  ToastDescription,
+  ToastViewport,
+} from "@/components/ui/toast"
 
 export default function SignupPage() {
-  const handleSignup = (data) => {
-    console.log("Signup Data:", data)
+  const navigate = useNavigate() // To redirect after successful signup
+  const [toastMessage, setToastMessage] = React.useState<{
+    title: string
+    description: string
+    variant?: "success" | "error"
+  } | null>(null)
+
+  // Handle the signup form submission
+  const handleSignup = async (data: {
+    email: string
+    username: string
+    password: string
+  }) => {
+    try {
+      // Call the signup service
+      await AuthService.signup(data.username, data.email, data.password)
+
+      // Show success toast and redirect to login
+      setToastMessage({
+        title: "Account Created",
+        description: "Please log in to continue.",
+        variant: "success",
+      })
+      setTimeout(() => navigate("/login"), 3000) // Redirect after 3 seconds
+    } catch (error) {
+      console.error("Error signing up:", error)
+
+      // Show error toast
+      setToastMessage({
+        title: "Signup Failed",
+        description:
+          error.response?.data?.message ||
+          "An error occurred. Please try again.",
+        variant: "error",
+      })
+    }
   }
 
   return (
-    <FormLayout
-      title="Crear Cuenta"
-      description="Rellena los campos para registrarte"
-      footer={
-        <p className="text-center text-sm text-gray-500">
-          ¿Ya tienes una cuenta?{" "}
-          <Link to="/login" className="text-indigo-600 hover:underline">
-            Inicia Sesión
-          </Link>
-        </p>
-      }
-    >
-      <AuthForm
-        schema={signupSchema}
-        onSubmit={handleSignup}
-        defaultValues={{ username: "", email: "", password: "" }}
-        submitText="Registrarse"
-        fields={[
-          {
-            name: "email",
-            label: "Correo Electrónico",
-            placeholder: "correo@ejemplo.com",
-          },
-          {
-            name: "username",
-            label: "Nombre de Usuario",
-            placeholder: "tu_usuario",
-          },
-          {
-            name: "password",
-            label: "Contraseña",
-            placeholder: "••••••••",
-            type: "password",
-          },
-        ]}
-      />
-    </FormLayout>
+    <ToastProvider>
+      <FormLayout
+        title="Create Account"
+        description="Fill in the fields below to create your account."
+        footer={
+          <p className="text-center text-sm text-gray-500">
+            Already have an account?{" "}
+            <Link to="/login" className="text-indigo-600 hover:underline">
+              Log In
+            </Link>
+          </p>
+        }
+      >
+        <AuthForm
+          schema={signupSchema} // Validation schema for the form
+          onSubmit={handleSignup} // Form submission handler
+          defaultValues={{ email: "", username: "", password: "" }} // Default form values
+          submitText="Sign Up"
+          fields={[
+            {
+              name: "email",
+              label: "Email",
+              placeholder: "you@example.com",
+            },
+            {
+              name: "username",
+              label: "Username",
+              placeholder: "your_username",
+            },
+            {
+              name: "password",
+              label: "Password",
+              placeholder: "••••••••",
+              type: "password",
+            },
+          ]}
+        />
+      </FormLayout>
+
+      {/* Toast Notification */}
+      {toastMessage && (
+        <Toast variant={toastMessage.variant}>
+          <ToastTitle>{toastMessage.title}</ToastTitle>
+          <ToastDescription>{toastMessage.description}</ToastDescription>
+        </Toast>
+      )}
+      <ToastViewport />
+    </ToastProvider>
   )
 }

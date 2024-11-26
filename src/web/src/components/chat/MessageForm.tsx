@@ -5,13 +5,13 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { messageSchema } from "@/schemas/messageSchema"
-import { MessageService } from "@/api/services/MessageService" // Import the MessageService
+import wsClient from "@/api/clients/wsClient"
 
 type MessageFormValues = z.infer<typeof messageSchema>
 
 interface MessageFormProps {
-  threadId?: string
-  onMessageSent?: () => void
+  threadId?: string // Optional thread ID for replies
+  onMessageSent?: () => void // Callback after sending a message
 }
 
 export const MessageForm: React.FC<MessageFormProps> = ({
@@ -23,6 +23,7 @@ export const MessageForm: React.FC<MessageFormProps> = ({
     handleSubmit,
     formState: { errors },
     setError,
+    reset,
   } = useForm<MessageFormValues>({
     resolver: zodResolver(messageSchema),
     defaultValues: { threadId },
@@ -30,19 +31,16 @@ export const MessageForm: React.FC<MessageFormProps> = ({
 
   const onSubmit = async (data: MessageFormValues) => {
     try {
-      // Call the MessageService to create the message
-      const newMessage = await MessageService.createMessage(
-        data.text,
-        threadId || "",
-      )
+      // Send the message using WebSocket
+      wsClient.sendMessage({ text: data.text, senderName: "You" }) // Add senderName for display purposes
 
-      // If the callback is provided, trigger it
+      // Trigger the callback if provided
       if (onMessageSent) {
         onMessageSent()
       }
 
-      // Clear form or show success message
-      console.log("Message sent successfully:", newMessage)
+      // Reset the form after successful submission
+      reset()
     } catch (error) {
       console.error("Error sending message:", error)
       setError("text", {
@@ -56,13 +54,13 @@ export const MessageForm: React.FC<MessageFormProps> = ({
     <form onSubmit={handleSubmit(onSubmit)} className="p-4 flex flex-col gap-2">
       <Textarea
         {...register("text")}
-        placeholder="Escribe tu mensaje..."
+        placeholder="Write your message..."
         className="flex-1"
       />
       {errors.text && (
         <p className="text-red-500 text-sm">{errors.text.message}</p>
       )}
-      <Button type="submit">Enviar</Button>
+      <Button type="submit">Send</Button>
     </form>
   )
 }

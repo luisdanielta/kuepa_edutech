@@ -3,6 +3,7 @@ import mongoose, { Schema, Document } from "mongoose"
 export interface MessageDocument extends Document {
   text: string
   sender: string
+  senderName: string
   thread: string | null
   createdAt: Date
   likes: string[]
@@ -11,6 +12,7 @@ export interface MessageDocument extends Document {
 const MessageSchema = new Schema({
   text: { type: String, required: true },
   sender: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  senderName: { type: Schema.Types.ObjectId, ref: "User", required: true },
   thread: { type: Schema.Types.ObjectId, ref: "Message", default: null },
   createdAt: { type: Date, default: Date.now },
   likes: [{ type: Schema.Types.ObjectId, ref: "User" }],

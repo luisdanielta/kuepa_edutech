@@ -60,11 +60,16 @@ export default function ModeratorBox() {
 
       {/* Body */}
       <div className="flex-1 flex items-center justify-center bg-gray-200">
-        <img
-          src="https://via.placeholder.com/800x450?text=Live+Video+Stream"
-          alt="Video Placeholder"
+        <iframe
+          width="800"
+          height="450"
+          src="https://www.youtube.com/embed/dQw4w9WgXcQ" // Replace with your desired YouTube video URL
+          title="YouTube Video"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
           className="h-full w-full object-cover"
-        />
+        ></iframe>
       </div>
     </div>
   )

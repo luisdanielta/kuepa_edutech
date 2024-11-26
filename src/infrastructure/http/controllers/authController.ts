@@ -15,10 +15,18 @@ export class AuthController {
 
   // Handles user signup and creates a new user
   public signup = async (req: Request, res: Response): Promise<void> => {
-    const { username, password, role } = req.body
+    const { email, username, password, role } = req.body
 
-    if (!username || !password) {
-      res.status(400).json({ message: "Username and password are required" })
+    if (!email || !username || !password) {
+      res
+        .status(400)
+        .json({ message: "Email, username, and password are required" })
+      return
+    }
+
+    const existingUser = await this.userRepository.findByUsername(username)
+    if (existingUser) {
+      res.status(409).json({ message: "Username already exists" })
       return
     }
 
@@ -27,15 +35,24 @@ export class AuthController {
       null,
       username,
       username,
-      `${username}@example.com`,
+      email,
       hashedPassword,
       new Date(),
       true,
       role === "moderator" ? "moderator" : "user",
     )
 
-    await this.userRepository.create(user)
-    res.status(201).json({ message: "User created successfully" })
+    const createdUser = await this.userRepository.create(user)
+
+    res.status(201).json({
+      message: "User created successfully",
+      user: {
+        id: createdUser.id,
+        username: createdUser.username,
+        email: createdUser.email,
+        role: createdUser.role,
+      },
+    })
   }
 
   // Handles user login and generates a JWT

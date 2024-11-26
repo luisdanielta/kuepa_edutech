@@ -48,6 +48,7 @@ export class MongoMessageRepository implements MessageRepository {
       message.id,
       message.text,
       message.sender.toString(),
+      message.senderName.toString(),
       message.thread ? message.thread.toString() : null,
       message.createdAt,
       message.likes.map((like) => like.toString()),

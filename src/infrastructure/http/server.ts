@@ -5,7 +5,7 @@ import { Database } from "@/infrastructure/database/conn"
 import AuthRouter from "@/infrastructure/http/routes/authRoutes"
 import MessageRouter from "@/infrastructure/http/routes/messageRoutes"
 import cors from "cors"
-import { WSServer } from "../websocket/ws"
+import { WSServer } from "@/infrastructure/websocket/ws"
 
 dotenv.config()
 
@@ -22,7 +22,7 @@ export class ServerApp {
   constructor() {
     this.app = express()
     this.server = http.createServer(this.app) // HTTP Server
-    this.wsServer = new WSServer(this.server) // WebSocket Server
+    this.wsServer = new WSServer(this.server)
 
     this.configureMiddlewares()
     this.configureRoutes()
