@@ -1,17 +1,50 @@
 import { Router } from "express"
-import { MongoUserRepository } from "@/infrastructure/database/mongoUserRepository"
-import { CreateUser } from "@/application/user/createUser"
-import { GetUserById } from "@/application/user/getUserById"
 import { UserController } from "../controllers/userController"
+import { UserUseCases } from "@/application/user/userUseCases"
+import { MongoUserRepository } from "@/infrastructure/database/mongoUserRepository"
+import { authenticateJWT } from "../middleware/authMiddleware"
+import { authorizeRoles } from "../middleware/roleMiddleware"
+import { asyncHandler } from "../middleware/asyncHandler"
 
 const UserRouter = Router()
 
 const userRepository = new MongoUserRepository()
-const createUser = new CreateUser(userRepository)
-const getUserById = new GetUserById(userRepository)
+const userUseCases = new UserUseCases(userRepository)
+const userController = new UserController(userUseCases)
 
-const userController = new UserController(createUser, getUserById)
+UserRouter.post(
+  "/",
+  authenticateJWT,
+  authorizeRoles(["moderator"]),
+  asyncHandler(userController.create),
+)
 
-UserRouter.post("/", (req, res) => userController.create(req, res))
-UserRouter.get("/:id", (req, res) => userController.getById(req, res))
+UserRouter.get(
+  "/",
+  authenticateJWT,
+  authorizeRoles(["moderator"]),
+  asyncHandler(userController.getAll),
+)
+
+UserRouter.get(
+  "/:id",
+  authenticateJWT,
+  authorizeRoles(["moderator"]),
+  asyncHandler(userController.getById),
+)
+
+UserRouter.put(
+  "/:id",
+  authenticateJWT,
+  authorizeRoles(["moderator"]),
+  asyncHandler(userController.update),
+)
+
+UserRouter.delete(
+  "/:id",
+  authenticateJWT,
+  authorizeRoles(["moderator"]),
+  asyncHandler(userController.delete),
+)
+
 export default UserRouter

@@ -1,9 +1,11 @@
 import { Router } from "express"
-import { AuthController } from "../controllers/authController"
+import { authController } from "../controllers/authController"
+import { asyncHandler } from "../middleware/asyncHandler"
 
 const AuthRouter = Router()
 
-AuthRouter.post("/signup", AuthController.signup)
-AuthRouter.post("/login", AuthController.login)
+// Public routes for guest users
+AuthRouter.post("/signup", asyncHandler(authController.signup))
+AuthRouter.post("/login", asyncHandler(authController.login))
 
 export default AuthRouter

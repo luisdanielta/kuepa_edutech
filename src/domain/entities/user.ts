@@ -1,3 +1,4 @@
+// Represents a user in the system with defined roles
 export class User {
   constructor(
     public readonly id: string | null,
@@ -7,6 +8,6 @@ export class User {
     public readonly password: string,
     public readonly createdAt: Date,
     public readonly status: boolean = true,
-    public readonly role: string = "user",
+    public readonly role: "user" | "moderator" = "user", // Restricting roles
   ) {}
 }

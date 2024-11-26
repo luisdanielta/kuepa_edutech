@@ -1,59 +1,86 @@
 import { Request, Response } from "express"
-import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
-import { UserModel } from "@/infrastructure/database/userModel"
+import bcrypt from "bcrypt"
+import { MongoUserRepository } from "@/infrastructure/database/mongoUserRepository"
+import { User } from "@/domain/entities/user"
+
+const JWT_SECRET = process.env.JWT_SECRET || "default_secret"
 
 export class AuthController {
-  static async signup(req: Request, res: Response): Promise<void> {
-    try {
-      const { name, username, email, password } = req.body
+  private userRepository: MongoUserRepository
 
-      const existingUser = await UserModel.findOne({ email })
-      if (existingUser) {
-        res.status(400).json({ error: "Email already in use" })
-        return
-      }
-
-      const hashedPassword = await bcrypt.hash(password, 10)
-
-      const user = await UserModel.create({
-        name,
-        username,
-        email,
-        password: hashedPassword,
-      })
-
-      res.status(201).json({ message: "User created successfully", user })
-    } catch (error) {
-      res.status(500).json({ error })
-    }
+  constructor(userRepository: MongoUserRepository) {
+    this.userRepository = userRepository
   }
 
-  static async login(req: Request, res: Response): Promise<void> {
-    try {
-      const { username, password } = req.body
+  // Handles user signup and creates a new user
+  public signup = async (req: Request, res: Response): Promise<void> => {
+    const { username, password, role } = req.body
 
-      const user = await UserModel.findOne({ username })
-      if (!user) {
-        res.status(404).json({ error: "User not found" })
-        return
-      }
-
-      const isPasswordValid = await bcrypt.compare(password, user.password)
-      if (!isPasswordValid) {
-        res.status(401).json({ error: "Invalid password" })
-        return
-      }
-
-      const token = jwt.sign(
-        { id: user._id, username: user.username, email: user.email },
-        process.env.JWT_SECRET!,
-        { expiresIn: "1h" },
-      )
-
-      res.status(200).json({ message: "Login successful", token })
-    } catch (error) {
-      res.status(500).json({ error })
+    if (!username || !password) {
+      res.status(400).json({ message: "Username and password are required" })
+      return
     }
+
+    const hashedPassword = await bcrypt.hash(password, 10)
+    const user = new User(
+      null,
+      username,
+      username,
+      `${username}@example.com`,
+      hashedPassword,
+      new Date(),
+      true,
+      role === "moderator" ? "moderator" : "user",
+    )
+
+    await this.userRepository.create(user)
+    res.status(201).json({ message: "User created successfully" })
+  }
+
+  // Handles user login and generates a JWT
+  public login = async (req: Request, res: Response): Promise<void> => {
+    const { username, password } = req.body
+
+    if (!username || !password) {
+      res.status(400).json({ message: "Username and password are required" })
+      return
+    }
+
+    const user = await this.userRepository.findByUsername(username)
+    if (!user) {
+      res.status(401).json({ message: "Invalid credentials" })
+      return
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password)
+    if (!isMatch) {
+      res.status(401).json({ message: "Invalid credentials" })
+      return
+    }
+
+    // Generate JWT
+    const token = jwt.sign(
+      {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+      },
+      JWT_SECRET,
+      { expiresIn: "1h" },
+    )
+
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+      },
+    })
   }
 }
+
+// Singleton instance for easy import
+export const authController = new AuthController(new MongoUserRepository())
