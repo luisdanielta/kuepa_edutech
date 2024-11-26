@@ -27,7 +27,7 @@ export default function SignupPage() {
     password: string
   }) => {
     try {
-      // Call the signup service
+      // Call the signup service without expecting a token
       await AuthService.signup(data.username, data.email, data.password)
 
       // Show success toast and redirect to login
@@ -38,7 +38,7 @@ export default function SignupPage() {
       })
       setTimeout(() => navigate("/login"), 3000) // Redirect after 3 seconds
     } catch (error) {
-      console.error("Error signing up:", error)
+      console.error("Error during signup:", error)
 
       // Show error toast
       setToastMessage({

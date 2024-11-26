@@ -60,47 +60,12 @@ export const AuthService = {
   },
 
   // Registers a new user and returns the user instance and token
-  signup: async (
-    username: string,
-    email: string,
-    password: string,
-  ): Promise<{ user: User; token: string }> => {
-    try {
-      const response = await apiClient.request<{ token: string }>(
-        Endpoints.auth.signup,
-        {
-          method: "POST",
-          body: { username, email, password },
-        },
-      )
-
-      const token = response.data.token
-
-      // Decode the token
-      const decoded = jwtDecode<DecodedToken>(token)
-
-      // Create a User instance
-      const user = new User(
-        decoded.id,
-        decoded.name,
-        decoded.username,
-        decoded.email,
-        "", // Password is never stored on the client
-        new Date(),
-        true,
-        decoded.role,
-      )
-
-      // Store the token in TokenStorage
-      TokenStorage.setToken(token)
-
-      return { user, token }
-    } catch (error) {
-      console.error("Error during signup:", error)
-      throw new Error(
-        error.response?.data?.message || "Failed to sign up. Please try again.",
-      )
-    }
+  signup: async (username: string, email: string, password: string) => {
+    await apiClient.request(Endpoints.auth.signup, {
+      method: "POST",
+      body: { username, email, password },
+    })
+    return { message: "User created successfully" }
   },
 
   // Logs out the user and clears storage
