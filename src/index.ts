@@ -1,18 +1,21 @@
 import express from "express"
 import dotenv from "dotenv"
 import { Database } from "@/infrastructure/database/conn"
+import AuthRouter from "@/infrastructure/http/routes/authRoutes"
 
 // Load environment variables
 dotenv.config()
 
 const PORT = process.env.PORT || 3000
 const uri = process.env.MONGODB_URI!
+const user = process.env.MONGODB_USER!
+const password = process.env.MONGODB_PASS!
 
 async function bootstrap() {
   try {
     // Mock database connection (replace with real connection logic)
     const db = Database.getInstance()
-    await db.connect(uri)
+    await db.connect(uri, user, password)
 
     const app = express()
 
@@ -21,9 +24,7 @@ async function bootstrap() {
     app.use(express.urlencoded({ extended: true })) // Parse URL-encoded payloads
 
     // Register routes
-    app.get("/api/health", (req, res) => {
-      res.status(200).send({ status: "Healthy" })
-    })
+    app.use("/v1/api/auth", AuthRouter)
 
     // Start the server
     app.listen(PORT, () => {

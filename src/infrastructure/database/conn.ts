@@ -13,14 +13,19 @@ export class Database {
     return Database.instance
   }
 
-  async connect(uri: string): Promise<void> {
+  async connect(uri: string, user?: string, password?: string): Promise<void> {
     if (this.isConnected) {
       console.log("Already connected to MongoDB.")
       return
     }
 
+    const options: mongoose.ConnectOptions = {}
+    if (user && password) {
+      options.auth = { username: user, password: password }
+    }
+
     try {
-      await mongoose.connect(uri)
+      await mongoose.connect(uri, options)
       this.isConnected = true
       console.log("Connected to MongoDB.")
     } catch (error) {
