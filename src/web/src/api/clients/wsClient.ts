@@ -1,6 +1,6 @@
 import { TokenStorage } from "@/utils/tokenStorage"
 
-const WS_URL = "ws://192.168.1.4:3000/ws"
+const WS_URL = "ws://localhost:3000/ws"
 
 // Event types handled by the WebSocket client
 type EventType = "new_message" | "delete_message" | "error"

@@ -5,7 +5,7 @@ export class ApiClient extends HttpClient {
   private static instance: ApiClient
 
   private constructor() {
-    super("http://192.168.1.4:3000/v1/api")
+    super("http://localhost:3000/v1/api")
   }
 
   public static getInstance(): ApiClient {
